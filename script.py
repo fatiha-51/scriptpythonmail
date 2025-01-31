@@ -4,26 +4,29 @@ import os
 
 app = Flask(__name__)
 
-@app.route('/generate-audio', methods=['POST'])
-def generate_audio():
-    data = request.get_json()  # Récupère le JSON envoyé dans le body
-    nom = data.get('nom')
-    sujet = data.get('sujet')
-    contenu = data.get('contenu')
-
-    # Exemple pour générer l'audio avec gTTS
-    message = f"Vous avez reçu un mail de {nom}, sujet : {sujet}, voici le message : {contenu}"
-    tts = gTTS(message, lang='fr')
-    file_path = '/tmp/message.mp3'  # Enregistrer dans un fichier temporaire
-
-    tts.save(file_path)
-
-    # Retourner le fichier audio ou un message de confirmation
-    return jsonify({"message": "Audio généré avec succès", "audio_url": file_path}), 200
-
 @app.route('/')
 def home():
     return "L'API fonctionne ! 🚀"
 
+@app.route('/generate-audio', methods=['POST'])
+def generate_audio():
+    try:
+        data = request.get_json()  # Récupère les données envoyées
+        nom = data.get('nom')
+        sujet = data.get('sujet')
+        contenu = data.get('contenu')
+
+        # Créer le texte à convertir en audio
+        text = f"Vous avez reçu un mail de {nom}, sujet {sujet}, voici le message : {contenu}"
+
+        # Utilisation de gTTS pour convertir le texte en audio
+        tts = gTTS(text)
+        tts.save("message.mp3")  # Sauvegarde l'audio dans un fichier
+
+        return jsonify({"message": "Audio généré avec succès"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
