@@ -1,0 +1,2 @@
+def run_script(input_data):
+    return input_data.upper()
