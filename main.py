@@ -1,8 +1,15 @@
 from flask import Flask, request, jsonify
 import subprocess
+import os
 
 app = Flask(__name__)
 
+# Route pour vérifier si l'API fonctionne
+@app.route('/')
+def home():
+    return "L'API fonctionne ! 🚀"
+
+# Route pour exécuter un script Python
 @app.route('/run-script', methods=['POST'])
 def run_script():
     try:
@@ -11,6 +18,7 @@ def run_script():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Lancer l'application sur le port défini par Render
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
-@app.route('/run-script', methods=['POST'])
+    port = int(os.environ.get("PORT", 10000))  # Render fournit un port spécifique
+    app.run(host='0.0.0.0', port=port)
