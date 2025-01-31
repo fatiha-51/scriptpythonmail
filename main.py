@@ -24,6 +24,3 @@ if __name__ == '__main__':
     
     # Instanciez et exécutez GunicornApplication avec votre application Flask
     GunicornApplication(app, options).run()
-    
-    # Instanciez et exécutez GunicornApplication avec votre application Flask
-    GunicornApplication(app, options).run()
