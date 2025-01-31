@@ -24,5 +24,11 @@ if __name__ == '__main__':
 
     # Ici, vous devriez instancier votre application Flask (ou autre) et la passer à GunicornApplication
     # Exemple :
-    # from myapp import app  # Assurez-vous d'importer votre application ici
-    # GunicornApplication(app, options).run()
+    from flask import Flask  # Assurez-vous d'importer votre application ici
+    app = Flask(__name__)
+
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
+
+    GunicornApplication(app, options).run()
