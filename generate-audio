@@ -3,6 +3,7 @@ from gtts import gTTS
 import os
 import uuid
 import logging
+import tempfile
 
 # Configurez le logging
 logging.basicConfig(level=logging.INFO)
@@ -13,6 +14,9 @@ app = Flask(__name__)
 @app.route('/generate-audio', methods=['POST'])
 def generate_audio():
     try:
+        if not request.is_json:
+            raise ValueError("Request must be JSON")
+        
         data = request.json
         nom = data.get('nom', 'Expéditeur inconnu')
         sujet = data.get('sujet', 'Sans sujet')
@@ -23,7 +27,11 @@ def generate_audio():
         texte_email = f"Vous avez reçu un mail de {nom}. Sujet : {sujet}. Voici le message : {contenu}."
         audio_filename = f"{uuid.uuid4()}_email_audio.mp3"
         tts = gTTS(texte_email, lang='fr')
-        tts.save(audio_filename)
+        
+        # Sauvegarder dans un répertoire temporaire
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
+            tts.save(tmp_file.name)
+            audio_filename = tmp_file.name
         
         logger.info(f"Audio generated and saved as {audio_filename}")
         
