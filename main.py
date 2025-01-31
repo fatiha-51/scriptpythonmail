@@ -1,6 +1,6 @@
 if __name__ == '__main__':
     from gunicorn.app.base import BaseApplication
-    from gunicorn.six import iteritems
+    # Supprimez l'importation de gunicorn.six
 
     class GunicornApplication(BaseApplication):
         def __init__(self, app, options=None):
@@ -9,9 +9,10 @@ if __name__ == '__main__':
             super(GunicornApplication, self).__init__()
 
         def load_config(self):
-            config = self.config
-            for key, value in iteritems(self.options):
-                config.set(key, value)
+            config = self.cfg  # Notez que c'est 'cfg' et non 'config'
+            for key, value in self.options.items():  # Utilisez items() au lieu de iteritems()
+                if key in config.settings and value is not None:
+                    config.set(key, value)
 
         def load(self):
             return self.application
@@ -21,5 +22,7 @@ if __name__ == '__main__':
         'workers': 4,             # nombre de workers pour gérer les requêtes
     }
 
-    GunicornApplication(app, options).run()
-
+    # Ici, vous devriez instancier votre application Flask (ou autre) et la passer à GunicornApplication
+    # Exemple :
+    # from myapp import app  # Assurez-vous d'importer votre application ici
+    # GunicornApplication(app, options).run()
