@@ -1,11 +1,25 @@
-@app.route('/generate-audio', methods=['POST'])
-def generate_audio():
-    data = request.get_json()  # Récupère le JSON envoyé dans le body
-    nom = data.get('nom')
-    sujet = data.get('sujet')
-    contenu = data.get('contenu')
+if __name__ == '__main__':
+    from gunicorn.app.base import BaseApplication
+    from gunicorn.six import iteritems
 
-    # Code pour générer l'audio ici (par exemple, avec gTTS)
+    class GunicornApplication(BaseApplication):
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.application = app
+            super(GunicornApplication, self).__init__()
 
-    return jsonify({"message": "Audio généré avec succès"}), 200
+        def load_config(self):
+            config = self.config
+            for key, value in iteritems(self.options):
+                config.set(key, value)
+
+        def load(self):
+            return self.application
+
+    options = {
+        'bind': '0.0.0.0:5000',  # écoute sur tous les ports disponibles
+        'workers': 4,             # nombre de workers pour gérer les requêtes
+    }
+
+    GunicornApplication(app, options).run()
 
