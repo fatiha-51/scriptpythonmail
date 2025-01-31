@@ -1,1 +1,2 @@
-print("Hello, je suis exécuté depuis Railway !")
+@app.route('/generate-audio', methods=['POST'])
+
