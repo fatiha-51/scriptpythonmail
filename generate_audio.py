@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_file
-from gtts import gTTS
+import pyttsx3
 import io
 import logging
 import uuid
@@ -25,30 +25,33 @@ def generate_audio():
 
         logger.info(f"Received request with data: {data}")
 
-        # Assurez-vous que chaque champ est utilisé pour construire le texte
-        texte_email = f"Vous avez reçu un mail de {nom}. Sujet : {sujet}. Voici le message : {contenu}."
-
-        # Ajoutez un identifiant unique pour garantir que chaque texte est différent
-        texte_email += f" ID de requête : {uuid.uuid4()}"
+        # Ajoutez un UUID dans le contenu principal
+        unique_id = str(uuid.uuid4())[:8]
+        texte_email = (
+            f"Vous avez reçu un mail de {nom}. "
+            f"Sujet : {sujet}. "
+            f"Voici le message avec ID unique : {contenu} ({unique_id})."
+        )
 
         logger.info(f"Generated text for TTS: {texte_email}")
 
-        # Générer l'audio en mémoire avec gTTS
-        tts = gTTS(texte_email, lang='fr')
+        # Initialiser le moteur de synthèse vocale
+        engine = pyttsx3.init()
 
-        # Utiliser un tampon en mémoire pour stocker l'audio
+        # Générer l'audio en mémoire
         audio_buffer = io.BytesIO()
-        tts.write_to_fp(audio_buffer)
-        audio_buffer.seek(0)  # Remettre le curseur au début du tampon
+        engine.save_to_file(texte_email, audio_buffer)
+        engine.runAndWait()
+        audio_buffer.seek(0)
 
         logger.info("Audio generated successfully")
 
         # Retournez le fichier audio en tant qu'attachement
         return send_file(
             audio_buffer,
-            mimetype="audio/mp3",
+            mimetype="audio/wav",  # pytttsx3 génère des fichiers WAV par défaut
             as_attachment=True,
-            download_name=f"{nom.replace(' ', '_')}_audio.mp3"
+            download_name=f"{nom.replace(' ', '_')}_audio.wav"
         )
     except Exception as e:
         logger.error(f"Error generating audio: {str(e)}")
