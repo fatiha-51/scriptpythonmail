@@ -1,14 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from gtts import gTTS
-import os
-import uuid
+import io
 import logging
 
 # Configurez le logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialiser l'application Flask
 app = Flask(__name__)
 
 @app.route('/generate-audio', methods=['POST'])
@@ -29,20 +27,23 @@ def generate_audio():
         # Construire le texte pour la synthèse vocale
         texte_email = f"Vous avez reçu un mail de {nom}. Sujet : {sujet}. Voici le message : {contenu}."
 
-        # Générer un nom unique pour le fichier audio
-        audio_filename = f"{uuid.uuid4()}_email_audio.mp3"
-
-        # Convertir le texte en audio avec gTTS
+        # Générer l'audio en mémoire avec gTTS
         tts = gTTS(texte_email, lang='fr')
-        tts.save(audio_filename)
 
-        logger.info(f"Audio generated and saved as {audio_filename}")
+        # Utiliser un tampon en mémoire pour stocker l'audio
+        audio_buffer = io.BytesIO()
+        tts.write_to_fp(audio_buffer)
+        audio_buffer.seek(0)  # Remettre le curseur au début du tampon
 
-        # Retournez une réponse JSON indiquant le succès
-        return jsonify({
-            "message": "✅ Audio généré avec succès",
-            "filename": audio_filename
-        })
+        logger.info("Audio generated successfully")
+
+        # Retournez le fichier audio en tant qu'attachement
+        return send_file(
+            audio_buffer,
+            mimetype="audio/mp3",
+            as_attachment=True,
+            download_name="email_audio.mp3"
+        )
     except Exception as e:
         logger.error(f"Error generating audio: {str(e)}")
         return jsonify({"error": str(e)}), 500
