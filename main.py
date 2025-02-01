@@ -1,4 +1,10 @@
-from generate_audio import app
+import os
+import sys
+
+# Ajoutez le répertoire racine du projet au PYTHONPATH (si nécessaire)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from generate_audio import app  # Assurez-vous que generate_audio.py est dans le même répertoire
 from gunicorn.app.base import BaseApplication
 
 class GunicornApplication(BaseApplication):
@@ -17,10 +23,13 @@ class GunicornApplication(BaseApplication):
         return self.application
 
 if __name__ == '__main__':
+    # Récupérez le port depuis la variable d'environnement (Render utilise $PORT)
+    port = int(os.environ.get("PORT", 5000))
+
     options = {
-        'bind': '0.0.0.0:5000',  # écoute sur tous les ports disponibles
-        'workers': 1,             # Utilisez un seul worker pour éviter les doublons
+        'bind': f"0.0.0.0:{port}",  # Utilisez le port fourni par Render
+        'workers': 1,               # Utilisez un seul worker pour éviter les doublons
     }
-    
+
     # Instanciez et exécutez GunicornApplication avec votre application Flask
     GunicornApplication(app, options).run()
