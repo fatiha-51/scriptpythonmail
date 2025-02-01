@@ -24,8 +24,13 @@ def generate_audio():
 
         logger.info(f"Received request with data: {data}")
 
-        # Construire le texte pour la synthèse vocale
+        # Construire le texte pour la synthèse vocale (assurez-vous que le texte est dynamique)
         texte_email = f"Vous avez reçu un mail de {nom}. Sujet : {sujet}. Voici le message : {contenu}."
+
+        # Ajoutez un identifiant unique pour vérification (optionnel)
+        texte_email += f" ID de requête : {uuid.uuid4()}"
+
+        logger.info(f"Generated text for TTS: {texte_email}")
 
         # Générer l'audio en mémoire avec gTTS
         tts = gTTS(texte_email, lang='fr')
