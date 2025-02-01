@@ -8,8 +8,8 @@ class GunicornApplication(BaseApplication):
         super(GunicornApplication, self).__init__()
 
     def load_config(self):
-        config = self.cfg  # Notez que c'est 'cfg' et non 'config'
-        for key, value in self.options.items():  # Utilisez items() au lieu de iteritems()
+        config = self.cfg
+        for key, value in self.options.items():
             if key in config.settings and value is not None:
                 config.set(key, value)
 
@@ -19,7 +19,7 @@ class GunicornApplication(BaseApplication):
 if __name__ == '__main__':
     options = {
         'bind': '0.0.0.0:5000',  # écoute sur tous les ports disponibles
-        'workers': 1,             # nombre de workers (réduit à 1 pour le débogage)
+        'workers': 1,             # Utilisez un seul worker pour éviter les doublons
     }
     
     # Instanciez et exécutez GunicornApplication avec votre application Flask
