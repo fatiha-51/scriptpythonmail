@@ -42,7 +42,7 @@ def generate_audio():
             audio_buffer,
             mimetype="audio/mp3",
             as_attachment=True,
-            download_name="email_audio.mp3"
+            download_name=f"{nom.replace(' ', '_')}_audio.mp3"
         )
     except Exception as e:
         logger.error(f"Error generating audio: {str(e)}")
