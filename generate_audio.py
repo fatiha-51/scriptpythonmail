@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, send_file
 from gtts import gTTS
 import io
 import logging
-import uuid  # Importez uuid pour générer des identifiants uniques
+import uuid
 
 # Configurez le logging
 logging.basicConfig(level=logging.INFO)
@@ -25,10 +25,10 @@ def generate_audio():
 
         logger.info(f"Received request with data: {data}")
 
-        # Construire le texte pour la synthèse vocale
+        # Assurez-vous que chaque champ est utilisé pour construire le texte
         texte_email = f"Vous avez reçu un mail de {nom}. Sujet : {sujet}. Voici le message : {contenu}."
 
-        # Ajoutez un identifiant unique pour vérification
+        # Ajoutez un identifiant unique pour garantir que chaque texte est différent
         texte_email += f" ID de requête : {uuid.uuid4()}"
 
         logger.info(f"Generated text for TTS: {texte_email}")
@@ -48,7 +48,7 @@ def generate_audio():
             audio_buffer,
             mimetype="audio/mp3",
             as_attachment=True,
-            download_name=f"{nom.replace(' ', '_')}_audio.mp3"  # Correction : Fermez la parenthèse
+            download_name=f"{nom.replace(' ', '_')}_audio.mp3"
         )
     except Exception as e:
         logger.error(f"Error generating audio: {str(e)}")
